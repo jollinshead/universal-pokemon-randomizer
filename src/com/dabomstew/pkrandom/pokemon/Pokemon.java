@@ -114,6 +114,10 @@ public class Pokemon implements Comparable<Pokemon> {
             // Minimum 20 HP, 10 everything else
             int bst = bst() - 70;
 
+            // Slight randomization of bst
+            final double mean = 1, sd = 0.1;
+            bst *= random.nextGaussian() * sd + mean;
+
             // Make weightings
             double hpW = random.nextDouble(), atkW = random.nextDouble(), defW = random.nextDouble();
             double spaW = random.nextDouble(), spdW = random.nextDouble(), speW = random.nextDouble();
