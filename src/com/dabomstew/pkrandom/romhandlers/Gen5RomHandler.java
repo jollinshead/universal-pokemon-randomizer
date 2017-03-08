@@ -1148,7 +1148,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                 for (int trno = 0; trno < 2; trno++) {
                     Trainer tr = allTrainers.next();
                     Iterator<TrainerPokemon> tpks = tr.pokemon.iterator();
-                    for (int poke = 0; poke < 3; poke++) {
+                    for (int poke = 0; poke < 3 && tpks.hasNext(); poke++) {
                         byte[] pkmndata = driftveil.files.get(trno * 3 + poke + 1);
                         TrainerPokemon tp = tpks.next();
                         // pokemon and held item

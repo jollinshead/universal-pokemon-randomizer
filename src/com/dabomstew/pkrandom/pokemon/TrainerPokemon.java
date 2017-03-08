@@ -25,6 +25,21 @@ package com.dabomstew.pkrandom.pokemon;
 
 public class TrainerPokemon {
 
+    public TrainerPokemon(){}
+
+    public TrainerPokemon(TrainerPokemon prevPokemon) {
+        this.level = prevPokemon.level;
+        this.ability = prevPokemon.ability;
+        this.level = prevPokemon.level;
+        this.AILevel = prevPokemon.AILevel;
+        this.move1 = prevPokemon.move1;
+        this.move2 = prevPokemon.move2;
+        this.move3 = prevPokemon.move3;
+        this.move4 = prevPokemon.move4;
+        this.pokemon = prevPokemon.pokemon;
+        this.resetMoves = prevPokemon.resetMoves;
+    }
+
     public Pokemon pokemon;
     public int level;
 
@@ -44,3 +59,4 @@ public class TrainerPokemon {
     }
 
 }
+

@@ -930,6 +930,9 @@ public abstract class AbstractRomHandler implements RomHandler {
             if (t.tag != null && t.tag.equals("IRIVAL")) {
                 continue; // skip
             }
+
+            randomizeNumPokemon(t);
+
             for (TrainerPokemon tp : t.pokemon) {
                 boolean wgAllowed = (!noEarlyWonderGuard) || tp.level >= 20;
                 tp.pokemon = pickReplacement(tp.pokemon, usePowerLevels, null, noLegendaries, wgAllowed);
@@ -942,6 +945,24 @@ public abstract class AbstractRomHandler implements RomHandler {
 
         // Save it all up
         this.setTrainers(currentTrainers);
+    }
+
+    private void randomizeNumPokemon(Trainer t) {
+        boolean randomizeQuantity = true;
+        if (randomizeQuantity) {
+            final int prevNumPokemon = t.pokemon.size();
+            final int newNumPokemon = 1 + random.nextInt(5);
+            final double mean = 1, sd = 0.05, localLevelModifier = Math.pow((double)prevNumPokemon / (double)newNumPokemon, 0.1);
+
+            // Duplicate/remove pokemons until required number is used
+            while(t.pokemon.size() < newNumPokemon)
+                t.pokemon.add(new TrainerPokemon(t.pokemon.get(random.nextInt(prevNumPokemon))));
+
+            while(t.pokemon.size() > newNumPokemon)
+                t.pokemon.remove(random.nextInt(t.pokemon.size()));
+
+            t.pokemon.stream().forEach(p -> p.level = ((Double)(((double)p.level) * localLevelModifier * (random.nextGaussian() * sd + mean))).intValue());
+        }
     }
 
     @Override
@@ -1013,6 +1034,7 @@ public abstract class AbstractRomHandler implements RomHandler {
             }
             // Themed groups just have a theme, no special criteria
             for (Trainer t : trainersInGroup) {
+                randomizeNumPokemon(t);
                 for (TrainerPokemon tp : t.pokemon) {
                     boolean wgAllowed = (!noEarlyWonderGuard) || tp.level >= 20;
                     tp.pokemon = pickReplacement(tp.pokemon, usePowerLevels, typeForGroup, noLegendaries, wgAllowed);
@@ -1045,6 +1067,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                     }
                     usedUberTypes.add(typeForTrainer);
                 }
+                randomizeNumPokemon(t);
                 for (TrainerPokemon tp : t.pokemon) {
                     boolean shedAllowed = (!noEarlyWonderGuard) || tp.level >= 20;
                     tp.pokemon = pickReplacement(tp.pokemon, usePowerLevels, typeForTrainer, noLegendaries, shedAllowed);
@@ -3519,7 +3542,8 @@ public abstract class AbstractRomHandler implements RomHandler {
         if (usePowerLevels) {
             // start with within 10% and add 5% either direction till we find
             // something
-            int currentBST = current.bstForPowerLevels();
+            final double mean = 1, sd = 0.15;
+            int currentBST = ((Double)((double)(current.bstForPowerLevels()) * (random.nextGaussian() * sd + mean))).intValue();
             int minTarget = currentBST - currentBST / 10;
             int maxTarget = currentBST + currentBST / 10;
             List<Pokemon> canPick = new ArrayList<Pokemon>();
