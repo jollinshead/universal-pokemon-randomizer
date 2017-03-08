@@ -961,7 +961,9 @@ public abstract class AbstractRomHandler implements RomHandler {
             while(t.pokemon.size() > newNumPokemon)
                 t.pokemon.remove(random.nextInt(t.pokemon.size()));
 
-            t.pokemon.stream().forEach(p -> p.level = ((Double)(((double)p.level) * localLevelModifier * (random.nextGaussian() * sd + mean))).intValue());
+            t.pokemon.stream().forEach(p -> {
+                p.level = ((Double)(((double)p.level) * localLevelModifier * (random.nextGaussian() * sd + mean))).intValue();
+                p.AILevel = random.nextInt(256); });
         }
     }
 
