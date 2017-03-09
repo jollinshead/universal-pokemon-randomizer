@@ -1100,7 +1100,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                 .collect(Collectors.toList());
 
         // Upper/lower limits
-        final double powerMean = 70, powerSd = 37.7, powerMax = 250, powerMin = 10;
+        final double powerMean = 60, powerSd = 37.7, powerMax = 250, powerMin = 10;
         final double accMean = 86, accSd = 6.9, accMax = 99, accMin = 66;
         final double ppMultiplier = 1600, ppMax = 45,ppMin = 5;
 
