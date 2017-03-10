@@ -1100,7 +1100,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                 .collect(Collectors.toList());
 
         // Upper/lower limits
-        final double powerMean = 70, accMean = 86, accSd = 6.9, ppMultiplier = 1300;
+        final double accMean = 86, accSd = 6.9;
         final int powerMax = 250, powerMin = 10, accMax = 99, accMin = 66, ppMax = 45,ppMin = 5;
 
         for (Move move : moves) {
@@ -1112,9 +1112,8 @@ public abstract class AbstractRomHandler implements RomHandler {
             final boolean infPp = (move.pp <= 100 && move.pp > 0) ? false : true;
 
             // New power value is based on a pre-defined distribution
-            double newPower = powerMin;
+            double newPower = powerMin, randNum = random.nextDouble();
             if(!infPower) {
-                double randNum = random.nextDouble();
                 iNewPower = ((Double) (((
                         + 6835.6 * Math.pow(randNum,6)
                         - 18071 * Math.pow(randNum,5)
@@ -1132,7 +1131,13 @@ public abstract class AbstractRomHandler implements RomHandler {
                 iNewAcc = ((Double)(random.nextGaussian() * accSd + accMean)).intValue();
 
             // New PP value is used to balance the established new power and new accuracy values
-            iNewPp = ((Double)(infPp ? ppMax : ppMultiplier / ((move.hitCount * newPower / powerMean) * newAcc))).intValue();
+            if(infPower)
+                iNewPower = 35 + random.nextInt(11);
+
+            iNewPp=((Double)((45 - (((double)iNewPower)*0.4/move.hitCount))*(1+((accMax-newAcc)/accMax)*2.2))).intValue();
+
+            if(infPower)
+                iNewPp = ((Double)((((double)iNewPp) + (((double)move.pp) * 3)) / 4)).intValue();
 
             // Write new values
             if(!infPower)
