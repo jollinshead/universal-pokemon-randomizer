@@ -964,7 +964,8 @@ public abstract class AbstractRomHandler implements RomHandler {
 
             t.pokemon.stream().forEach(p -> {
                 p.level = ((Double)(((double)p.level) * localLevelModifier * (random.nextGaussian() * sd + mean))).intValue();
-                p.AILevel = ((Double)(Math.pow(random.nextGaussian(), skillsSkew) * skillsSd + skillsMean)).intValue(); });
+                int newAiLevel = ((Double)(Math.pow(random.nextGaussian(), skillsSkew) * skillsSd + skillsMean)).intValue();
+                p.AILevel = newAiLevel > 255 ? 255 : (newAiLevel < 0 ? 0 : newAiLevel); });
         }
     }
 
