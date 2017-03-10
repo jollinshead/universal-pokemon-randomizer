@@ -1114,7 +1114,7 @@ public abstract class AbstractRomHandler implements RomHandler {
             // New power value is based on a pre-defined distribution
             double newPower = powerMin;
             if(!infPower) {
-                double randNum = random.nextGaussian();
+                double randNum = random.nextDouble();
                 iNewPower = ((Double) (((
                         + 6835.6 * Math.pow(randNum,6)
                         - 18071 * Math.pow(randNum,5)
