@@ -1100,11 +1100,12 @@ public abstract class AbstractRomHandler implements RomHandler {
                 .collect(Collectors.toList());
 
         // Upper/lower limits
-        final double powerSkew = 1.2, powerMean = 70, powerSd = 40, powerMax = 250, powerMin = 10;
-        final double accMean = 86, accSd = 6.9, accMax = 99, accMin = 66;
-        final double ppMultiplier = 1600, ppMax = 45,ppMin = 5;
+        final double powerMean = 70, accMean = 86, accSd = 6.9, ppMultiplier = 1300;
+        final int powerMax = 250, powerMin = 10, accMax = 99, accMin = 66, ppMax = 45,ppMin = 5;
 
         for (Move move : moves) {
+
+            int iNewPower = move.power, iNewAcc = ((Double)move.hitratio).intValue(), iNewPp = move.pp;
 
             final boolean infPower = (move.power <= 1000 && move.power > 0) ? false : true;
             final boolean infAcc = (move.hitratio <= 100 && move.hitratio > 0) ? false : true;
@@ -1113,37 +1114,33 @@ public abstract class AbstractRomHandler implements RomHandler {
             // New power value is based on a pre-defined distribution
             double newPower = powerMin;
             if(!infPower) {
-                newPower = (Math.pow(random.nextGaussian(), powerSkew) * powerSd + powerMean) / move.hitCount;
-                if (newPower < powerMin)
-                    newPower = powerMin;
-                else if (newPower > powerMax)
-                    newPower = powerMax;
+                double randNum = random.nextGaussian();
+                iNewPower = ((Double) (((
+                        + 6835.6 * Math.pow(randNum,6)
+                        - 18071 * Math.pow(randNum,5)
+                        + 17988 * Math.pow(randNum,4)
+                        - 8085.7 * Math.pow(randNum,3)
+                        + 1435.2 * Math.pow(randNum,2)
+                        + 88.343 * randNum + 10))
+                        / move.hitCount)).intValue();
             }
+
 
             // New accuracy value is based on a pre-defined distribution
             double newAcc = accMax;
-            if(!infAcc) {
-                newAcc = (random.nextGaussian() * accSd + accMean);
-                if (newAcc < accMin)
-                    newAcc = accMin;
-                else if (newAcc > accMax)
-                    newAcc = accMax;
-            }
+            if(!infAcc)
+                iNewAcc = ((Double)(random.nextGaussian() * accSd + accMean)).intValue();
 
             // New PP value is used to balance the established new power and new accuracy values
-            double newPp = infPp ? ppMax : ppMultiplier / ((move.hitCount * newPower / powerMean) * newAcc);
-            if (newPp < ppMin)
-                newPp = ppMin;
-            else if (newPp > ppMax)
-                newPp = ppMax;
+            iNewPp = ((Double)(infPp ? ppMax : ppMultiplier / ((move.hitCount * newPower / powerMean) * newAcc))).intValue();
 
             // Write new values
             if(!infPower)
-                move.power = ((Double)newPower).intValue();
+                move.power = iNewPower > powerMax ? powerMax : ( iNewPower < powerMin ? powerMin : iNewPower );
             if(!infAcc)
-                move.hitratio = ((Double)newAcc).intValue();
+                move.hitratio = iNewAcc > accMax ? accMax : ( iNewAcc < accMin ? accMin : iNewAcc );
             if(!infPp)
-                move.pp = ((Double)newPp).intValue();
+                move.pp = iNewPp > ppMax ? ppMax : ( iNewPp < ppMin ? ppMin : iNewPp );
 
         }
     }
