@@ -952,6 +952,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         if (randomizeQuantity) {
             final int prevNumPokemon = t.pokemon.size();
             final int newNumPokemon = 1 + random.nextInt(5);
+            final double skillsSkew = 1.5, skillsMean = 100, skillsSd = 80;
             final double mean = 1, sd = 0.05, localLevelModifier = Math.pow((double)prevNumPokemon / (double)newNumPokemon, 0.1);
 
             // Duplicate/remove pokemons until required number is used
@@ -963,7 +964,7 @@ public abstract class AbstractRomHandler implements RomHandler {
 
             t.pokemon.stream().forEach(p -> {
                 p.level = ((Double)(((double)p.level) * localLevelModifier * (random.nextGaussian() * sd + mean))).intValue();
-                p.AILevel = random.nextInt(256); });
+                p.AILevel = ((Double)(Math.pow(random.nextGaussian(), skillsSkew) * skillsSd + skillsMean)).intValue(); });
         }
     }
 
