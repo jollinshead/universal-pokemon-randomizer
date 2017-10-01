@@ -98,16 +98,21 @@ public class Randomizer {
             romHandler.printMoveUpdates();
         }
 
-        if (settings.isRandomizeMovePowers()) {
-            romHandler.randomizeMovePowers();
-        }
+        boolean balanced = true;
+        if(balanced)
+            romHandler.randomizeMoveBalanced();
+        else {
+            if (settings.isRandomizeMovePowers()) {
+                romHandler.randomizeMovePowers();
+            }
 
-        if (settings.isRandomizeMoveAccuracies()) {
-            romHandler.randomizeMoveAccuracies();
-        }
+            if (settings.isRandomizeMoveAccuracies()) {
+                romHandler.randomizeMoveAccuracies();
+            }
 
-        if (settings.isRandomizeMovePPs()) {
-            romHandler.randomizeMovePPs();
+            if (settings.isRandomizeMovePPs()) {
+                romHandler.randomizeMovePPs();
+            }
         }
 
         if (settings.isRandomizeMoveTypes()) {

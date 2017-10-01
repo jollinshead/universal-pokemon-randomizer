@@ -174,6 +174,8 @@ public interface RomHandler {
 
     // Randomizer: moves
 
+    public void randomizeMoveBalanced();
+
     public void randomizeMovePowers();
 
     public void randomizeMovePPs();

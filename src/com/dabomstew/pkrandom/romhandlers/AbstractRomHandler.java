@@ -43,6 +43,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import com.dabomstew.pkrandom.CustomNamesSet;
 import com.dabomstew.pkrandom.MiscTweak;
@@ -1122,6 +1123,64 @@ public abstract class AbstractRomHandler implements RomHandler {
     // MOVE DATA
     // All randomizers don't touch move ID 165 (Struggle)
     // They also have other exclusions where necessary to stop things glitching.
+
+    @Override
+    public void randomizeMoveBalanced() {
+        List<Move> moves = this.getMoves().stream()
+                .filter(u -> u != null)
+                .filter(u -> u.internalId != 165)
+                .collect(Collectors.toList());
+
+        // Upper/lower limits
+        final double accMean = 86, accSd = 6.9;
+        final int powerMax = 250, powerMin = 10, accMax = 99, accMin = 66, ppMax = 45,ppMin = 5;
+
+        for (Move move : moves) {
+
+            int iNewPower = move.power, iNewAcc = ((Double)move.hitratio).intValue(), iNewPp = move.pp;
+
+            final boolean infPower = (move.power <= 1000 && move.power > 0) ? false : true;
+            final boolean infAcc = (move.hitratio <= 100 && move.hitratio > 0) ? false : true;
+            final boolean infPp = (move.pp <= 100 && move.pp > 0) ? false : true;
+
+            // New power value is based on a pre-defined distribution
+            double newPower = powerMin, randNum = random.nextDouble();
+            if(!infPower) {
+                iNewPower = ((Double) (((
+                        + 6835.6 * Math.pow(randNum,6)
+                        - 18071 * Math.pow(randNum,5)
+                        + 17988 * Math.pow(randNum,4)
+                        - 8085.7 * Math.pow(randNum,3)
+                        + 1435.2 * Math.pow(randNum,2)
+                        + 88.343 * randNum + 10))
+                        / move.hitCount)).intValue();
+            }
+
+
+            // New accuracy value is based on a pre-defined distribution
+            double newAcc = accMax;
+            if(!infAcc)
+                iNewAcc = ((Double)(random.nextGaussian() * accSd + accMean)).intValue();
+
+            // New PP value is used to balance the established new power and new accuracy values
+            if(infPower)
+                iNewPower = 35 + random.nextInt(11);
+
+            iNewPp=((Double)((45 - (((double)iNewPower)*0.4/move.hitCount))*(1+((accMax-newAcc)/accMax)*2.2))).intValue();
+
+            if(infPower)
+                iNewPp = ((Double)((((double)iNewPp) + (((double)move.pp) * 3)) / 4)).intValue();
+
+            // Write new values
+            if(!infPower)
+                move.power = iNewPower > powerMax ? powerMax : ( iNewPower < powerMin ? powerMin : iNewPower );
+            if(!infAcc)
+                move.hitratio = iNewAcc > accMax ? accMax : ( iNewAcc < accMin ? accMin : iNewAcc );
+            if(!infPp)
+                move.pp = iNewPp > ppMax ? ppMax : ( iNewPp < ppMin ? ppMin : iNewPp );
+
+        }
+    }
 
     @Override
     public void randomizeMovePowers() {
