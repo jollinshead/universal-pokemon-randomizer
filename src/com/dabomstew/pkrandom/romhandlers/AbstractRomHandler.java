@@ -360,6 +360,9 @@ public abstract class AbstractRomHandler implements RomHandler {
 
     @Override
     public void randomizePokemonTypes(boolean evolutionSanity) {
+
+        boolean keepPrimary = true;
+
         List<Pokemon> allPokes = this.getPokemon();
         if (evolutionSanity) {
             // Type randomization with evolution sanity
@@ -369,7 +372,9 @@ public abstract class AbstractRomHandler implements RomHandler {
                     // A Basic/EFC pokemon has a 35% chance of a second type if
                     // it has an evolution that copies type/stats, a 50% chance
                     // otherwise
-                    pk.primaryType = randomType();
+                    if(!keepPrimary)
+                        pk.primaryType = randomType();
+
                     pk.secondaryType = null;
                     if (pk.evolutionsFrom.size() == 1 && pk.evolutionsFrom.get(0).carryStats) {
                         if (AbstractRomHandler.this.random.nextDouble() < 0.35) {
